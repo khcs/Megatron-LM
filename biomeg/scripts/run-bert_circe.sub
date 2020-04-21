@@ -1,0 +1,19 @@
+#!/bin/bash
+#SBATCH --exclusive             # exclusive node access
+#SBATCH --mem=0                 # all mem avail
+#SBATCH --mail-type=FAIL        # only send email on failure
+#SBATCH --ntasks-per-node=16     # n tasks per machine (one task per gpu)
+#SBATCH --threads-per-core=2    # HT is on
+#SBATCH --cores-per-socket=20   # 20 cores on each socket
+#SBATCH --overcommit
+#SBATCH --partition=batch
+#SBATCH -N 2
+#SBATCH -A bio-bert     
+
+# usage
+# sbatch --export=LOGNAME="logname",RESUME="resume",... run-bert_circe.sub
+ 
+readonly container_image="nvcr.io/nvidia/pytorch:20.03-py3"
+readonly mounts=".:/workspace/MegatronLM,/gpfs/fs1/hshin/datasets/pubmed_megatron:/data,/gpfs/fs1/hshin/checkpoints/bert_pyt:/checkpoints"
+
+srun --container-image ${container_image} --container-mounts=${mounts} --export=L_NAME=${LOGNAME},CKPT_PATH=${CKPT_PATH},V_FILE=${VOCAB_FILE},D_PATH=${DATA_PATH} "/workspace/MegatronLM/biomeg/scripts/bert-pretraining_circe.sh"

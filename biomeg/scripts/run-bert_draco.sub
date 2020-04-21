@@ -1,0 +1,13 @@
+#!/bin/bash
+
+readonly project="ent_joc_model_bert_pyt"
+readonly partition="batch"
+readonly ngpu=8
+readonly nnodes=1
+readonly ntasks_per_node=8
+
+readonly container_image="nvcr.io/nvidia/pytorch:20.03-py3"
+
+readonly mounts=".:/workspace/MegatronLM,/home/hshin/dsb2017/bert_checkpoints:/checkpoints,/home/hshin/dsb2017/pubmed_megatron:/data"
+
+nvs batch --project ${project} --container-image ${container_image} --gpus ${ngpu} --nodes ${nnodes} --ntasks-per-node=${ntasks_per_node} --partition ${partition} --container-mounts=${mounts} ${5} "/workspace/MegatronLM/biomeg/scripts/bert-pretraining_draco.sh ${1} ${2} ${3} ${4}"
